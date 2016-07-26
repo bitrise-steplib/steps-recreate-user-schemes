@@ -14,10 +14,13 @@ import (
 	"github.com/bitrise-io/go-utils/pathutil"
 )
 
-func runCommand(envs []string, name string, args ...string) (string, error) {
+func runCommand(envs []string, dir string, name string, args ...string) (string, error) {
 	cmd := exec.Command(name, args...)
 	if len(envs) > 0 {
 		cmd.Env = append(cmd.Env, envs...)
+	}
+	if dir != "" {
+		cmd.Dir = dir
 	}
 	outBytes, err := cmd.CombinedOutput()
 	outStr := string(outBytes)
@@ -35,11 +38,15 @@ func properReturn(err error, out string) error {
 	return err
 }
 
+// SharedSchemeFiles ...
+func SharedSchemeFiles(projectOrWorkspacePth string) ([]string, error) {
+	pattern := filepath.Join(projectOrWorkspacePth, "xcshareddata", "xcschemes", "*.xcscheme")
+	return filepath.Glob(pattern)
+}
+
 // SharedSchemes ...
 func SharedSchemes(projectOrWorkspacePth string) ([]string, error) {
-	pattern := filepath.Join(projectOrWorkspacePth, "xcshareddata", "xcschemes", "*.xcscheme")
-
-	schemeFiles, err := filepath.Glob(pattern)
+	schemeFiles, err := SharedSchemeFiles(projectOrWorkspacePth)
 	if err != nil {
 		return []string{}, err
 	}
@@ -62,11 +69,15 @@ func SharedSchemes(projectOrWorkspacePth string) ([]string, error) {
 	return schemes, nil
 }
 
+// UserSchemeFiles ...
+func UserSchemeFiles(projectOrWorkspacePth string) ([]string, error) {
+	pattern := filepath.Join(projectOrWorkspacePth, "xcuserdata", "*.xcuserdatad", "xcschemes", "*.xcscheme")
+	return filepath.Glob(pattern)
+}
+
 // UserSchemes ...
 func UserSchemes(projectOrWorkspacePth string) ([]string, error) {
-	pattern := filepath.Join(projectOrWorkspacePth, "xcuserdata", "*.xcuserdatad", "xcschemes", "*.xcscheme")
-
-	schemeFiles, err := filepath.Glob(pattern)
+	schemeFiles, err := UserSchemeFiles(projectOrWorkspacePth)
 	if err != nil {
 		return []string{}, err
 	}
@@ -90,7 +101,10 @@ func ReCreateProjectUserSchemes(projectPth string) error {
 require 'json'
 
 project_path = ENV['project_path']
+
 begin
+  raise 'empty path' if project_path.empty?
+
   project = Xcodeproj::Project.open(project_path)
   project.recreate_user_schemes
   project.save
@@ -99,7 +113,8 @@ rescue => ex
   puts('--- Stack trace: ---')
   puts(ex.backtrace.to_s)
   exit(1)
-end`
+end
+`
 
 	tmpDir, err := pathutil.NormalizedOSTempDirPath("bitrise")
 	if err != nil {
@@ -111,15 +126,18 @@ end`
 		return err
 	}
 
-	projectPthEnv := "project_path=" + projectPth
+	projectDir := filepath.Dir(projectPth)
+	projectBase := filepath.Base(projectPth)
 
-	out, err := runCommand([]string{projectPthEnv}, "ruby", rubyScriptPth)
+	out, err := runCommand([]string{fmt.Sprintf("project_path=%s", projectBase), "LC_ALL=en_US.UTF-8"}, projectDir, "ruby", rubyScriptPth)
 	return properReturn(err, out)
 }
 
 // WorkspaceProjectReferences ...
 func WorkspaceProjectReferences(workspace string) ([]string, error) {
 	projects := []string{}
+
+	workspaceDir := filepath.Dir(workspace)
 
 	xcworkspacedataPth := path.Join(workspace, "contents.xcworkspacedata")
 	if exist, err := pathutil.IsPathExists(xcworkspacedataPth); err != nil {
@@ -148,7 +166,8 @@ func WorkspaceProjectReferences(workspace string) ([]string, error) {
 			matches := regexp.FindStringSubmatch(line)
 			if len(matches) == 3 {
 				projectName := matches[2]
-				projects = append(projects, projectName+".xcodeproj")
+				project := filepath.Join(workspaceDir, projectName+".xcodeproj")
+				projects = append(projects, project)
 			}
 		}
 	}
@@ -156,6 +175,7 @@ func WorkspaceProjectReferences(workspace string) ([]string, error) {
 	return projects, nil
 }
 
+/*
 // ShareUserScheme ...
 func ShareUserScheme(projectPth, scheme string) error {
 	rubyScriptContent := `require 'xcodeproj'
@@ -189,3 +209,4 @@ end`
 	out, err := runCommand([]string{projectPthEnv, schemeEnv}, "ruby", rubyScriptPth)
 	return properReturn(err, out)
 }
+*/
