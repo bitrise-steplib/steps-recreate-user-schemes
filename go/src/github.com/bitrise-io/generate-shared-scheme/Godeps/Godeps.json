@@ -7,20 +7,16 @@
 	],
 	"Deps": [
 		{
-			"ImportPath": "github.com/bitrise-io/go-utils/cmdex",
-			"Rev": "31f807a683deafb1cca243b46971acbc9002bac2"
-		},
-		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "31f807a683deafb1cca243b46971acbc9002bac2"
+			"Rev": "fa96f81589d913ebfa4a960f75a032017eb81878"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/fileutil",
-			"Rev": "31f807a683deafb1cca243b46971acbc9002bac2"
+			"Rev": "fa96f81589d913ebfa4a960f75a032017eb81878"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "31f807a683deafb1cca243b46971acbc9002bac2"
+			"Rev": "fa96f81589d913ebfa4a960f75a032017eb81878"
 		},
 		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",

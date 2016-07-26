@@ -174,39 +174,3 @@ func WorkspaceProjectReferences(workspace string) ([]string, error) {
 
 	return projects, nil
 }
-
-/*
-// ShareUserScheme ...
-func ShareUserScheme(projectPth, scheme string) error {
-	rubyScriptContent := `require 'xcodeproj'
-require 'json'
-
-project_path = ENV['project_path']
-scheme = ENV['scheme']
-
-begin
-  project = Xcodeproj::XCScheme.share_scheme(project_path, scheme)
-rescue => ex
-  puts(ex.inspect.to_s)
-  puts('--- Stack trace: ---')
-  puts(ex.backtrace.to_s)
-  exit(1)
-end`
-
-	tmpDir, err := pathutil.NormalizedOSTempDirPath("bitrise")
-	if err != nil {
-		return err
-	}
-
-	rubyScriptPth := path.Join(tmpDir, "share_scheme.rb")
-	if err := fileutil.WriteStringToFile(rubyScriptPth, rubyScriptContent); err != nil {
-		return err
-	}
-
-	projectPthEnv := "project_path=" + projectPth
-	schemeEnv := "scheme=" + scheme
-
-	out, err := runCommand([]string{projectPthEnv, schemeEnv}, "ruby", rubyScriptPth)
-	return properReturn(err, out)
-}
-*/
