@@ -7,20 +7,32 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "github.com/bitrise-io/go-utils/cmdex",
+			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
+		},
+		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "fa96f81589d913ebfa4a960f75a032017eb81878"
+			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/fileutil",
-			"Rev": "fa96f81589d913ebfa4a960f75a032017eb81878"
+			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "fa96f81589d913ebfa4a960f75a032017eb81878"
+			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
+		},
+		{
+			"ImportPath": "github.com/bitrise-io/xcode-utils/xcodeproj",
+			"Rev": "1317b18a9f05f6afbecd9324fd783caa7159f6dc"
 		},
 		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",
 			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
+		},
+		{
+			"ImportPath": "github.com/going/toolkit/log",
+			"Rev": "5bff591dc40da25dcc875d3fa1a3373d74d45411"
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",

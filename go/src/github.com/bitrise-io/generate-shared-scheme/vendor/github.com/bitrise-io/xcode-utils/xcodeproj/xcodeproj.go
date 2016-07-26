@@ -1,42 +1,21 @@
-package xcodeproject
+package xcodeproj
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
-	"os/exec"
+	"os"
 	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
 
+	"github.com/bitrise-io/go-utils/cmdex"
 	"github.com/bitrise-io/go-utils/errorutil"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/pathutil"
+	"github.com/going/toolkit/log"
 )
-
-func runCommand(envs []string, dir string, name string, args ...string) (string, error) {
-	cmd := exec.Command(name, args...)
-	if len(envs) > 0 {
-		cmd.Env = append(cmd.Env, envs...)
-	}
-	if dir != "" {
-		cmd.Dir = dir
-	}
-	outBytes, err := cmd.CombinedOutput()
-	outStr := string(outBytes)
-	return strings.TrimSpace(outStr), err
-}
-
-func properReturn(err error, out string) error {
-	if err == nil {
-		return nil
-	}
-
-	if errorutil.IsExitStatusError(err) && out != "" {
-		return errors.New(out)
-	}
-	return err
-}
 
 // SharedSchemeFiles ...
 func SharedSchemeFiles(projectOrWorkspacePth string) ([]string, error) {
@@ -129,8 +108,16 @@ end
 	projectDir := filepath.Dir(projectPth)
 	projectBase := filepath.Base(projectPth)
 
-	out, err := runCommand([]string{fmt.Sprintf("project_path=%s", projectBase), "LC_ALL=en_US.UTF-8"}, projectDir, "ruby", rubyScriptPth)
-	return properReturn(err, out)
+	envs := []string{"project_path=" + projectBase, "LC_ALL=en_US.UTF-8"}
+	out, err := cmdex.NewCommand("ruby", rubyScriptPth).SetDir(projectDir).AddEnvs(envs...).RunAndReturnTrimmedCombinedOutput()
+	if err != nil {
+		if errorutil.IsExitStatusError(err) && out != "" {
+			return errors.New(out)
+		}
+		return err
+	}
+
+	return nil
 }
 
 // WorkspaceProjectReferences ...
@@ -173,4 +160,33 @@ func WorkspaceProjectReferences(workspace string) ([]string, error) {
 	}
 
 	return projects, nil
+}
+
+// SchemeContainsXCTestBuildAction ...
+func SchemeContainsXCTestBuildAction(schemeFile string) (bool, error) {
+	file, err := os.Open(schemeFile)
+	if err != nil {
+		return false, err
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Warnf("Failed to close file (%s), err: %s", schemeFile, err)
+		}
+	}()
+
+	testTargetExp := regexp.MustCompile(`BuildableName = ".+.xctest"`)
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if testTargetExp.FindString(line) != "" {
+			return true, nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return false, err
+	}
+
+	return false, nil
 }

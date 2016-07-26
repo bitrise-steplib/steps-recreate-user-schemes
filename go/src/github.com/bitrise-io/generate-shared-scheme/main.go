@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	log "github.com/bitrise-io/generate-shared-scheme/logger"
-	"github.com/bitrise-io/generate-shared-scheme/xcodeproject"
+	"github.com/bitrise-io/xcode-utils/xcodeproj"
 )
 
 const (
@@ -64,14 +64,14 @@ func main() {
 
 		log.Info("Searching for workspace (%s) shared schemes...", workspaceName)
 
-		workspaceSharedSchemes, err := xcodeproject.SharedSchemes(projectOrWorkspacePth)
+		workspaceSharedSchemes, err := xcodeproj.SharedSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
 
 		log.Details("workspace (%s) shared schemes: %v", workspaceName, workspaceSharedSchemes)
 
-		projects, err := xcodeproject.WorkspaceProjectReferences(projectOrWorkspacePth)
+		projects, err := xcodeproj.WorkspaceProjectReferences(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace referred projects, error: %s", err)
 		}
@@ -79,7 +79,7 @@ func main() {
 		for _, project := range projects {
 			projectName := filepath.Base(project)
 
-			workspaceProjectSharedSchemes, err := xcodeproject.SharedSchemes(project)
+			workspaceProjectSharedSchemes, err := xcodeproj.SharedSchemes(project)
 			if err != nil {
 				log.Fail("Failed to list project (%s) shared schemes, error: %s", project, err)
 			}
@@ -95,7 +95,7 @@ func main() {
 
 		log.Info("Searching for project (%s) shared schemes...", projectName)
 
-		projectSchemes, err := xcodeproject.SharedSchemes(projectOrWorkspacePth)
+		projectSchemes, err := xcodeproj.SharedSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list project (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
@@ -116,7 +116,7 @@ func main() {
 
 		log.Info("No shared scheme found for workspace (%s), generating default schemes...", workspaceName)
 
-		projects, err := xcodeproject.WorkspaceProjectReferences(projectOrWorkspacePth)
+		projects, err := xcodeproj.WorkspaceProjectReferences(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace referred projects, error: %s", err)
 		}
@@ -126,7 +126,7 @@ func main() {
 
 			log.Details("generating default schemes for: %s", projectName)
 
-			if err := xcodeproject.ReCreateProjectUserSchemes(project); err != nil {
+			if err := xcodeproj.ReCreateProjectUserSchemes(project); err != nil {
 				log.Fail("Failed to recreate project (%s) user schemes, error: %s", project, err)
 			}
 		}
@@ -136,48 +136,10 @@ func main() {
 		log.Info("No shared scheme found for project (%s), generating default schemes...", projectName)
 		log.Details("generating default schemes for: %s", projectName)
 
-		if err := xcodeproject.ReCreateProjectUserSchemes(projectOrWorkspacePth); err != nil {
+		if err := xcodeproj.ReCreateProjectUserSchemes(projectOrWorkspacePth); err != nil {
 			log.Fail("Failed to recreate project (%s) user schemes, error: %s", projectOrWorkspacePth, err)
 		}
 	}
-
-	/*
-		// Share user schemes
-		if isWorkspace {
-			projects, err := xcodeproject.WorkspaceProjectReferences(projectOrWorkspacePth)
-			if err != nil {
-				log.Fail("Failed to list workspace referred projects, error: %s", err)
-			}
-
-			for _, project := range projects {
-				workspaceProjectUserSchemes, err := xcodeproject.UserSchemes(project)
-				if err != nil {
-					log.Fail("Failed to list project (%s) user schemes, error: %s", project, err)
-				}
-
-				for _, scheme := range workspaceProjectUserSchemes {
-					if err := xcodeproject.ShareUserScheme(project, scheme); err != nil {
-						log.Fail("Failed to recreate project (%s) user schemes (%s), error: %s", project, scheme, err)
-					}
-				}
-			}
-		} else {
-			if err := xcodeproject.ReCreateProjectUserSchemes(projectOrWorkspacePth); err != nil {
-				log.Fail("Failed to recreate project (%s) user schemes, error: %s", err)
-			}
-
-			projectUserSchemes, err := xcodeproject.UserSchemes(projectOrWorkspacePth)
-			if err != nil {
-				log.Fail("Failed to list project (%s) user schemes, error: %s", projectOrWorkspacePth, err)
-			}
-
-			for _, scheme := range projectUserSchemes {
-				if err := xcodeproject.ShareUserScheme(projectOrWorkspacePth, scheme); err != nil {
-					log.Fail("Failed to recreate project (%s) user schemes (%s), error: %s", projectOrWorkspacePth, scheme, err)
-				}
-			}
-		}
-	*/
 
 	// Ensure user schemes
 	userSchemes := []string{}
@@ -187,14 +149,14 @@ func main() {
 
 		workspaceName := filepath.Base(projectOrWorkspacePth)
 
-		workspaceUserSchemes, err := xcodeproject.UserSchemes(projectOrWorkspacePth)
+		workspaceUserSchemes, err := xcodeproj.UserSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
 
 		log.Details("workspace (%s) user schemes: %v", workspaceName, workspaceUserSchemes)
 
-		projects, err := xcodeproject.WorkspaceProjectReferences(projectOrWorkspacePth)
+		projects, err := xcodeproj.WorkspaceProjectReferences(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace referred projects, error: %s", err)
 		}
@@ -202,7 +164,7 @@ func main() {
 		for _, project := range projects {
 			projectName := filepath.Base(project)
 
-			workspaceProjectUserSchemes, err := xcodeproject.UserSchemes(project)
+			workspaceProjectUserSchemes, err := xcodeproj.UserSchemes(project)
 			if err != nil {
 				log.Fail("Failed to list project (%s) shared schemes, error: %s", project, err)
 			}
@@ -216,7 +178,7 @@ func main() {
 	} else {
 		log.Info("Ensure project generated user schemes")
 
-		projectSchemes, err := xcodeproject.UserSchemes(projectOrWorkspacePth)
+		projectSchemes, err := xcodeproj.UserSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list project (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
