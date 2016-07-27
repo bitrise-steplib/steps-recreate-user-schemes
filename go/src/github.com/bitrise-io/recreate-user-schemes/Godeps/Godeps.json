@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/bitrise-io/generate-shared-scheme",
+	"ImportPath": "github.com/bitrise-io/recreate-user-schemes",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v74",
 	"Packages": [
@@ -8,31 +8,27 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/cmdex",
-			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
+			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
+			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/fileutil",
-			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
+			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "2e24ff934eb8c324ea6e580f502c760ff5421bbd"
+			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/xcode-utils/xcodeproj",
-			"Rev": "1317b18a9f05f6afbecd9324fd783caa7159f6dc"
+			"Rev": "dca8958be6339a951b10ec41123b2c6b603805df"
 		},
 		{
 			"ImportPath": "github.com/davecgh/go-spew/spew",
 			"Rev": "5215b55f46b2b919f50a1df0eaa5886afe4e3b3d"
-		},
-		{
-			"ImportPath": "github.com/going/toolkit/log",
-			"Rev": "5bff591dc40da25dcc875d3fa1a3373d74d45411"
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib/difflib",

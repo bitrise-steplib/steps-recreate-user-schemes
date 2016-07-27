@@ -1,10 +1,9 @@
 # Generate User Schemes
 
-This step generates default User Schemes.
+This step recreates default user schemes.
 
-If no Shared or User Scheme exist in the project, step will generate User schemes, 
-just like Xcode does.
-
+If no shared schemes exist in the project/workspace, step will recreate default user schemes, 
+just like Xcode does. 
 
 ## How to use this Step
 
