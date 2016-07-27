@@ -1,13 +1,13 @@
-title: Generate User Schemes
-summary: Generates Users Schemes
+title: Recreate User Schemes
+summary: Recreate User Schemes
 description: |-
-  This step generates default User Schemes.
+  This step recreates default user schemes.
 
-  If no Shared or User Scheme exist in the project, step will generate User schemes, 
+  If no shared schemes exist in the project/workspace, step will recreate default user schemes, 
   just like Xcode does. 
-website: https://github.com/bitrise-steplib/steps-generate-shared-schemes
-source_code_url: https://github.com/bitrise-steplib/steps-generate-shared-scheme
-support_url: https://github.com/bitrise-steplib/steps-generate-shared-scheme/issues
+website: https://github.com/bitrise-steplib/steps-recreate-user-schemes
+source_code_url: https://github.com/bitrise-steplib/steps-recreate-user-schemes
+support_url: https://github.com/bitrise-steplib/steps-recreate-user-schemes/issues
 host_os_tags:
   - osx-10.10
 project_type_tags:
@@ -21,8 +21,8 @@ run_if: ""
 inputs:
   - project_path: 
     opts:
-      title: "Project path"
+      title: "Project or Workspace path"
       summary: ""
       description: |
-        A `.xcodeproj` path.
+        A `.xcodeproj/.xcworkspace` path.
       is_required: true
