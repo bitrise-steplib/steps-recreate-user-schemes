@@ -24,7 +24,7 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/xcode-utils/xcodeproj",
-			"Rev": "dca8958be6339a951b10ec41123b2c6b603805df"
+			"Rev": "fe27904d6d8e569bd481c1a1115bd93585489c6d"
 		}
 	]
 }

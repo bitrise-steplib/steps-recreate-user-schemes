@@ -53,34 +53,41 @@ func main() {
 	// Shared schemes
 	log.Info("Searching for shared schemes...")
 
-	sharedSchemes := []string{}
+	sharedSchemeMap := map[string]bool{}
 
 	if isWorkspace {
-		workspaceSharedSchemes, err := xcodeproj.WorkspaceSharedSchemes(projectOrWorkspacePth)
+		workspaceSharedSchemeMap, err := xcodeproj.WorkspaceSharedSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
 
-		sharedSchemes = workspaceSharedSchemes
+		sharedSchemeMap = workspaceSharedSchemeMap
 	} else {
-		projectSchemes, err := xcodeproj.ProjectSharedSchemes(projectOrWorkspacePth)
+		projectSchemesMap, err := xcodeproj.ProjectSharedSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list project (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
 
-		sharedSchemes = projectSchemes
+		sharedSchemeMap = projectSchemesMap
 	}
 
-	log.Details("shared schemes: %v", sharedSchemes)
+	log.Details("shared scheme count: %d", len(sharedSchemeMap))
 
-	if len(sharedSchemes) > 0 {
-		log.Done("Shared schemes: %v", sharedSchemes)
+	if len(sharedSchemeMap) > 0 {
+		log.Done("Shared schemes:")
+		for scheme := range sharedSchemeMap {
+			log.Done("- %s", scheme)
+		}
+
 		os.Exit(0)
 	}
 
 	// Generate schemes
 	fmt.Println("")
-	log.Warn("No shared schemes found, generating default user schemes...")
+	log.Error("No shared schemes found, generating default user schemes...")
+	log.Error("The newly generated schemes, may differs from the ones in your project.")
+	log.Error("Make sure to share your schemes, to have the expected behaviour.")
+	fmt.Println("")
 
 	if isWorkspace {
 		if err := xcodeproj.ReCreateWorkspaceUserSchemes(projectOrWorkspacePth); err != nil {
@@ -95,30 +102,33 @@ func main() {
 	// Ensure user schemes
 	log.Info("Ensure generated user schemes")
 
-	userSchemes := []string{}
+	userSchemeMap := map[string]bool{}
 
 	if isWorkspace {
-		workspaceUserSchemes, err := xcodeproj.WorkspaceUserSchemes(projectOrWorkspacePth)
+		workspaceUserSchemeMap, err := xcodeproj.WorkspaceUserSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
 
-		userSchemes = workspaceUserSchemes
+		userSchemeMap = workspaceUserSchemeMap
 	} else {
-		projectSchemes, err := xcodeproj.ProjectUserSchemes(projectOrWorkspacePth)
+		projectSchemeMap, err := xcodeproj.ProjectUserSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list project (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
 
-		userSchemes = projectSchemes
+		userSchemeMap = projectSchemeMap
 	}
 
-	log.Details("generated user schemes: %v", userSchemes)
+	log.Details("generated user scheme count: %d", len(userSchemeMap))
 
-	if len(userSchemes) == 0 {
+	if len(userSchemeMap) == 0 {
 		log.Fail("No user schemes generated")
 	}
 
 	fmt.Println("")
-	log.Done("Generated user schemes: %v", userSchemes)
+	log.Done("Generated user schemes:")
+	for scheme := range userSchemeMap {
+		log.Done("- %s", scheme)
+	}
 }
