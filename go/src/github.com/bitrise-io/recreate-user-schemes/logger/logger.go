@@ -18,6 +18,12 @@ func Warn(format string, v ...interface{}) {
 	fmt.Printf("\x1b[33;1m%s\x1b[0m\n", errorMsg)
 }
 
+// Error ...
+func Error(format string, v ...interface{}) {
+	errorMsg := fmt.Sprintf(format, v...)
+	fmt.Printf("\x1b[31;1m%s\x1b[0m\n", errorMsg)
+}
+
 // Info ...
 func Info(format string, v ...interface{}) {
 	fmt.Println()
