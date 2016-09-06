@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.1)
+## Changelog (Current version: 0.9.2)
 
 -----------------
+
+### 0.9.2 (2016 Sep 06)
+
+* [5381120] prepare for 0.9.2
+* [af218f3] Go 15 (#3)
 
 ### 0.9.1 (2016 Jul 29)
 
@@ -9,4 +14,4 @@
 
 -----------------
 
-Updated: 2016 Jul 29
+Updated: 2016 Sep 06
