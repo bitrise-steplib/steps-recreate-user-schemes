@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/bitrise-io/recreate-user-schemes",
-	"GoVersion": "go1.6",
+	"GoVersion": "go1.7",
 	"GodepVersion": "v74",
 	"Packages": [
 		"./..."
@@ -8,23 +8,23 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/cmdex",
-			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
+			"Rev": "38bcfbc82d7f3400346e2f5440ad172cec8be97d"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
+			"Rev": "38bcfbc82d7f3400346e2f5440ad172cec8be97d"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/fileutil",
-			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
+			"Rev": "38bcfbc82d7f3400346e2f5440ad172cec8be97d"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "62166e88f0470a6280c62191660f0f0cb2066a2b"
+			"Rev": "38bcfbc82d7f3400346e2f5440ad172cec8be97d"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/xcode-utils/xcodeproj",
-			"Rev": "fe27904d6d8e569bd481c1a1115bd93585489c6d"
+			"Rev": "42983fa3508613b28727cf519b8718100950db67"
 		}
 	]
 }
