@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.3)
+## Changelog (Current version: 0.9.4)
 
 -----------------
+
+### 0.9.4 (2016 Sep 08)
+
+* [0df9d30] prepare for 0.9.4
+* [65a17d4] fix if build target has no test target
 
 ### 0.9.3 (2016 Sep 08)
 
