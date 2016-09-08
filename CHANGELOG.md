@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.2)
+## Changelog (Current version: 0.9.3)
 
 -----------------
+
+### 0.9.3 (2016 Sep 08)
+
+* [e3fd9dd] prepare for 0.9.3
+* [3de7678] Scheme fix (#4)
 
 ### 0.9.2 (2016 Sep 06)
 
@@ -14,4 +19,4 @@
 
 -----------------
 
-Updated: 2016 Sep 06
+Updated: 2016 Sep 08
