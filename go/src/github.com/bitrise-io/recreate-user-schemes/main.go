@@ -105,31 +105,16 @@ func main() {
 	schemeMap := map[string]bool{}
 
 	if isWorkspace {
-		workspaceSchemeMap, err := xcodeproj.WorkspaceUserSchemes(projectOrWorkspacePth)
+		workspaceSchemeMap, err := xcodeproj.WorkspaceSharedSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list workspace (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
 		}
 
-		if len(workspaceSchemeMap) == 0 {
-			workspaceSchemeMap, err = xcodeproj.WorkspaceSharedSchemes(projectOrWorkspacePth)
-			if err != nil {
-				log.Fail("Failed to list workspace (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
-			}
-
-		}
-
 		schemeMap = workspaceSchemeMap
 	} else {
-		projectSchemeMap, err := xcodeproj.ProjectUserSchemes(projectOrWorkspacePth)
+		projectSchemeMap, err := xcodeproj.ProjectSharedSchemes(projectOrWorkspacePth)
 		if err != nil {
 			log.Fail("Failed to list project (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
-		}
-
-		if len(projectSchemeMap) == 0 {
-			projectSchemeMap, err = xcodeproj.ProjectSharedSchemes(projectOrWorkspacePth)
-			if err != nil {
-				log.Fail("Failed to list project (%s) shared schemes, error: %s", projectOrWorkspacePth, err)
-			}
 		}
 
 		schemeMap = projectSchemeMap
