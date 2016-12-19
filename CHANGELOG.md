@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.4)
+## Changelog (Current version: 0.9.5)
 
 -----------------
+
+### 0.9.5 (2016 Dec 19)
+
+* [945612b] prepare for 0.9.5
+* [aa4b0db] macos project type tag (#5)
 
 ### 0.9.4 (2016 Sep 08)
 
@@ -24,4 +29,4 @@
 
 -----------------
 
-Updated: 2016 Sep 08
+Updated: 2016 Dec 19
