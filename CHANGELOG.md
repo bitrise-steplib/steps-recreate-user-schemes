@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.5)
+## Changelog (Current version: 1.0.0)
 
 -----------------
+
+### 1.0.0 (2017 May 18)
+
+* [cd4d21d] prepare for 1.0.0
+* [2253b94] Review (#6)
 
 ### 0.9.5 (2016 Dec 19)
 
@@ -29,4 +34,4 @@
 
 -----------------
 
-Updated: 2016 Dec 19
+Updated: 2017 May 18
