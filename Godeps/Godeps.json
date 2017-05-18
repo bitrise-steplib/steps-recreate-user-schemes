@@ -1,0 +1,42 @@
+{
+	"ImportPath": "github.com/bitrise-steplib/steps-recreate-user-schemes",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/bitrise-io/go-utils/colorstring",
+			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+		},
+		{
+			"ImportPath": "github.com/bitrise-io/go-utils/command",
+			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+		},
+		{
+			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
+			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+		},
+		{
+			"ImportPath": "github.com/bitrise-io/go-utils/fileutil",
+			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+		},
+		{
+			"ImportPath": "github.com/bitrise-io/go-utils/log",
+			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+		},
+		{
+			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
+			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+		},
+		{
+			"ImportPath": "github.com/bitrise-tools/go-steputils/input",
+			"Rev": "4d564bfeca0fbb7a9e148fb0efd7e7ddf0ed2ead"
+		},
+		{
+			"ImportPath": "github.com/bitrise-tools/go-xcode/xcodeproj",
+			"Rev": "2dfa286d87ca7ef6e52f871de262de29e7129845"
+		}
+	]
+}
