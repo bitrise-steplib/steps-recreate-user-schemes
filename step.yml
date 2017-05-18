@@ -11,7 +11,7 @@ support_url: https://github.com/bitrise-steplib/steps-recreate-user-schemes/issu
 host_os_tags: []
 project_type_tags:
 - ios
-- mac
+- macos
 type_tags:
 - utility
 is_requires_admin_user: false
