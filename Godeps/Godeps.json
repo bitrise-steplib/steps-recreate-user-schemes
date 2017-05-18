@@ -32,7 +32,7 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-steputils/input",
-			"Rev": "4d564bfeca0fbb7a9e148fb0efd7e7ddf0ed2ead"
+			"Rev": "e737fab2504923be01c758731dde689f3286c0b5"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-xcode/xcodeproj",

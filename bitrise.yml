@@ -8,12 +8,30 @@ app:
   # define these in your .bitrise.secrets.yml
   - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/ios-no-shared-schemes.git
   - PROJECT_PATH: BitriseXcode7Sample.xcodeproj
-  - CLONE_INTO_DIR: _tmp
 
 workflows:
   test:
     before_run:
     - go-tests
+    after_run:
+    - missing-schemes-test
+    - existing-schemes-test
+
+  missing-schemes-test:
+    envs:
+    - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/ios-no-shared-schemes.git
+    - PROJECT_PATH: BitriseXcode7Sample.xcodeproj
+    after_run:
+    - _common
+
+  existing-schemes-test:
+    envs:
+    - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/sample-apps-ios-simple-objc.git
+    - PROJECT_PATH: ios-simple-objc/ios-simple-objc.xcodeproj
+    after_run:
+    - _common
+
+  _common:
     steps:
     - script:
         inputs:
@@ -21,12 +39,12 @@ workflows:
             #!/bin/bash
             set -e
             set -v
-            rm -rf $CLONE_INTO_DIR
+            rm -rf _tmp
         - is_create_path: true
     - change-workdir:
         title: Switch working dir to test / _tmp dir
         inputs:
-        - path: $CLONE_INTO_DIR
+        - path: _tmp
         - is_create_path: true
     - git-clone:
         run_if: true

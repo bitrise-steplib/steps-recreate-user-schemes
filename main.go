@@ -118,6 +118,6 @@ func main() {
 	fmt.Println("")
 	log.Donef("Generated schemes:")
 	for _, scheme := range schemes {
-		log.Infof("- %s", scheme.Name)
+		log.Printf("- %s", scheme.Name)
 	}
 }
