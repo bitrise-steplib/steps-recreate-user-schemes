@@ -1,4 +1,4 @@
-package xcodeproj
+package schemes
 
 const xcodeprojGemfileContent = `source 'https://rubygems.org'
 	

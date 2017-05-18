@@ -10,14 +10,22 @@ source_code_url: https://github.com/bitrise-steplib/steps-recreate-user-schemes
 support_url: https://github.com/bitrise-steplib/steps-recreate-user-schemes/issues
 host_os_tags: []
 project_type_tags:
-  - ios
-  - macos
-type_tags: []
+- ios
+- mac
+type_tags:
+- utility
 is_requires_admin_user: false
 is_always_run: false
 is_skippable: false
-deps: {}
-run_if: ""
+deps:
+  brew:
+  - name: go
+  apt_get:
+  - name: golang
+    bin_name: go
+toolkit:
+  go:
+    package_name: github.com/bitrise-steplib/steps-recreate-user-schemes
 inputs:
   - project_path: 
     opts:
