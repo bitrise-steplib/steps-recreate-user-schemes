@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-steplib/steps-recreate-user-schemes/schemes"
@@ -24,13 +23,12 @@ func createConfigsModelFromEnvs() ConfigsModel {
 
 func (configs ConfigsModel) print() {
 	log.Infof("Configs:")
-
 	log.Printf("- ProjectPath: %s", configs.ProjectPath)
 }
 
 func (configs ConfigsModel) validate() error {
 	if err := input.ValidateIfPathExists(configs.ProjectPath); err != nil {
-		return fmt.Errorf("ProjectPath %s", err)
+		return fmt.Errorf("ProjectPath - %s", err)
 	}
 
 	return nil
@@ -43,42 +41,29 @@ func failf(format string, v ...interface{}) {
 
 func main() {
 	configs := createConfigsModelFromEnvs()
+	configs.print()
 
 	fmt.Println()
-	configs.print()
 
 	if err := configs.validate(); err != nil {
 		failf("Issue with input: %s", err)
 	}
 
+	// Shared schemes
 	isWorkspace := xcodeproj.IsXCWorkspace(configs.ProjectPath)
+	sharedSchemes := []xcodeproj.SchemeModel{}
+	var err error
+
 	if isWorkspace {
-		log.Infof("Analyzing workspace: %s", configs.ProjectPath)
+		log.Infof("Searching for workspace shared schemes...")
+		sharedSchemes, err = xcodeproj.WorkspaceSharedSchemes(configs.ProjectPath)
 	} else {
-		log.Infof("Analyzing project: %s", configs.ProjectPath)
+		log.Infof("Searching for project shared schemes...")
+		sharedSchemes, err = xcodeproj.ProjectSharedSchemes(configs.ProjectPath)
 	}
 
-	projectOrWorkspaceName := filepath.Base(configs.ProjectPath)
-
-	// Shared schemes
-	log.Infof("Searching for shared schemes...")
-
-	sharedSchemes := []xcodeproj.SchemeModel{}
-
-	if isWorkspace {
-		workspaceSharedSchemes, err := xcodeproj.WorkspaceSharedSchemes(configs.ProjectPath)
-		if err != nil {
-			failf("Failed to list workspace (%s) shared schemes, error: %s", configs.ProjectPath, err)
-		}
-
-		sharedSchemes = workspaceSharedSchemes
-	} else {
-		projectSchemesMap, err := xcodeproj.ProjectSharedSchemes(configs.ProjectPath)
-		if err != nil {
-			failf("Failed to list project (%s) shared schemes, error: %s", configs.ProjectPath, err)
-		}
-
-		sharedSchemes = projectSchemesMap
+	if err != nil {
+		failf("Failed to list shared schemes, error: %s", err)
 	}
 
 	log.Printf("shared scheme count: %d", len(sharedSchemes))
@@ -100,13 +85,13 @@ func main() {
 	fmt.Println("")
 
 	if isWorkspace {
-		if err := schemes.ReCreateWorkspaceUserSchemes(configs.ProjectPath); err != nil {
-			failf("Failed to recreate workspace (%s) user schemes, error: %s", projectOrWorkspaceName, err)
-		}
+		err = schemes.ReCreateWorkspaceUserSchemes(configs.ProjectPath)
 	} else {
-		if err := schemes.ReCreateProjectUserSchemes(configs.ProjectPath); err != nil {
-			failf("Failed to recreate project (%s) user schemes, error: %s", configs.ProjectPath, err)
-		}
+		err = schemes.ReCreateProjectUserSchemes(configs.ProjectPath)
+	}
+
+	if err != nil {
+		failf("Failed to recreate user schemes, error: %s", err)
 	}
 
 	// Ensure user schemes
@@ -115,19 +100,13 @@ func main() {
 	schemes := []xcodeproj.SchemeModel{}
 
 	if isWorkspace {
-		workspaceSchemes, err := xcodeproj.WorkspaceSharedSchemes(configs.ProjectPath)
-		if err != nil {
-			failf("Failed to list workspace (%s) shared schemes, error: %s", configs.ProjectPath, err)
-		}
-
-		schemes = workspaceSchemes
+		schemes, err = xcodeproj.WorkspaceSharedSchemes(configs.ProjectPath)
 	} else {
-		projectSchemes, err := xcodeproj.ProjectSharedSchemes(configs.ProjectPath)
-		if err != nil {
-			failf("Failed to list project (%s) shared schemes, error: %s", configs.ProjectPath, err)
-		}
+		schemes, err = xcodeproj.ProjectSharedSchemes(configs.ProjectPath)
+	}
 
-		schemes = projectSchemes
+	if err != nil {
+		failf("Failed to list shared schemes, error: %s", err)
 	}
 
 	log.Printf("generated scheme count: %d", len(schemes))
@@ -139,6 +118,6 @@ func main() {
 	fmt.Println("")
 	log.Donef("Generated schemes:")
 	for _, scheme := range schemes {
-		log.Donef("- %s", scheme.Name)
+		log.Infof("- %s", scheme.Name)
 	}
 }
