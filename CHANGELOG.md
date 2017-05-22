@@ -1,6 +1,11 @@
-## Changelog (Current version: 1.0.0)
+## Changelog (Current version: 1.0.1)
 
 -----------------
+
+### 1.0.1 (2017 May 22)
+
+* [a47a3d4] Prepare for 1.0.1
+* [8ceed7b] Fix for #7 (#8)
 
 ### 1.0.0 (2017 May 18)
 
@@ -34,4 +39,4 @@
 
 -----------------
 
-Updated: 2017 May 18
+Updated: 2017 May 22
