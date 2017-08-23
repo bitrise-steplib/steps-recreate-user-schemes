@@ -1,6 +1,11 @@
-## Changelog (Current version: 1.0.1)
+## Changelog (Current version: 1.0.2)
 
 -----------------
+
+### 1.0.2 (2017 Aug 23)
+
+* [937e4c2] prepare for 1.0.2
+* [6af9ac2] cocoapods fix (#9)
 
 ### 1.0.1 (2017 May 22)
 
@@ -39,4 +44,4 @@
 
 -----------------
 
-Updated: 2017 May 22
+Updated: 2017 Aug 23
