@@ -134,22 +134,6 @@ func ReCreateProjectUserSchemes(projectPth string) error {
 	return runRubyScript(recreateUserSchemesRubyScriptContent, xcodeprojGemfileContent, projectDir, envs)
 }
 
-// ReCreateWorkspaceUserSchemes ...
-func ReCreateWorkspaceUserSchemes(workspacePth string) error {
-	projects, err := xcodeproj.WorkspaceProjectReferences(workspacePth)
-	if err != nil {
-		return err
-	}
-
-	for _, project := range projects {
-		if err := ReCreateProjectUserSchemes(project); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func filesInDir(dir string) ([]string, error) {
 	files := []string{}
 	if err := filepath.Walk(dir, func(path string, f os.FileInfo, err error) error {
@@ -188,36 +172,6 @@ func userSchemeFilePaths(projectOrWorkspacePth string) ([]string, error) {
 	return filterUserSchemeFilePaths(paths), nil
 }
 
-// ProjectUserSchemeFilePaths ...
-func ProjectUserSchemeFilePaths(projectPth string) ([]string, error) {
-	return userSchemeFilePaths(projectPth)
-}
-
-// WorkspaceUserSchemeFilePaths ...
-func WorkspaceUserSchemeFilePaths(workspacePth string) ([]string, error) {
-	workspaceSchemeFilePaths, err := userSchemeFilePaths(workspacePth)
-	if err != nil {
-		return []string{}, err
-	}
-
-	projects, err := xcodeproj.WorkspaceProjectReferences(workspacePth)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, project := range projects {
-		projectSchemeFilePaths, err := userSchemeFilePaths(project)
-		if err != nil {
-			return []string{}, err
-		}
-		workspaceSchemeFilePaths = append(workspaceSchemeFilePaths, projectSchemeFilePaths...)
-	}
-
-	sort.Strings(workspaceSchemeFilePaths)
-
-	return workspaceSchemeFilePaths, nil
-}
-
 // SchemeNameFromPath ...
 func SchemeNameFromPath(schemePth string) string {
 	basename := filepath.Base(schemePth)
@@ -242,37 +196,6 @@ func userSchemes(projectOrWorkspacePth string) (map[string]bool, error) {
 			return map[string]bool{}, err
 		}
 		schemeMap[schemeName] = hasXCtest
-	}
-
-	return schemeMap, nil
-}
-
-// ProjectUserSchemes ...
-func ProjectUserSchemes(projectPth string) (map[string]bool, error) {
-	return userSchemes(projectPth)
-}
-
-// WorkspaceUserSchemes ...
-func WorkspaceUserSchemes(workspacePth string) (map[string]bool, error) {
-	schemeMap, err := userSchemes(workspacePth)
-	if err != nil {
-		return map[string]bool{}, err
-	}
-
-	projects, err := xcodeproj.WorkspaceProjectReferences(workspacePth)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, project := range projects {
-		projectSchemeMap, err := userSchemes(project)
-		if err != nil {
-			return map[string]bool{}, err
-		}
-
-		for name, hasXCtest := range projectSchemeMap {
-			schemeMap[name] = hasXCtest
-		}
 	}
 
 	return schemeMap, nil
