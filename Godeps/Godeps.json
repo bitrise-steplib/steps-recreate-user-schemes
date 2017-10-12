@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/bitrise-steplib/steps-recreate-user-schemes",
-	"GoVersion": "go1.8",
+	"GoVersion": "go1.9",
 	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
@@ -12,6 +12,10 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/command",
+			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
+		},
+		{
+			"ImportPath": "github.com/bitrise-io/go-utils/command/rubyscript",
 			"Rev": "6eb582e08179a025ed2deb86ea6dffbd13ba1ff6"
 		},
 		{
@@ -35,8 +39,21 @@
 			"Rev": "a848c9870ff7d745a8fb2a951e1c81fcb147b4ec"
 		},
 		{
+			"ImportPath": "github.com/bitrise-tools/go-xcode/plistutil",
+			"Rev": "52495a9c3a5fdea31f4ca3e9bdf6e07531ab0f49"
+		},
+		{
 			"ImportPath": "github.com/bitrise-tools/go-xcode/xcodeproj",
-			"Rev": "7dc40d31974d0c1880cf908a8b419c251961b04b"
+			"Rev": "52495a9c3a5fdea31f4ca3e9bdf6e07531ab0f49"
+		},
+		{
+			"ImportPath": "github.com/pkg/errors",
+			"Comment": "v0.8.0-6-g2b3a18b",
+			"Rev": "2b3a18b5f0fb6b4f9190549597d3f962c02bc5eb"
+		},
+		{
+			"ImportPath": "howett.net/plist",
+			"Rev": "2f847ea62b17703c861484a09f0e5841328a2cb9"
 		}
 	]
 }

@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/bitrise-io/go-utils/log"
-	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-steplib/steps-recreate-user-schemes/schemes"
 	"github.com/bitrise-tools/go-steputils/input"
 	"github.com/bitrise-tools/go-xcode/xcodeproj"
@@ -88,34 +87,8 @@ func main() {
 	fmt.Println()
 	log.Infof("Generating user schemes")
 
-	if isWorkspace {
-		projects, err := xcodeproj.WorkspaceProjectReferences(configs.ProjectPath)
-		if err != nil {
-			failf("Failed to get workspace referred projects, error: %s", err)
-		}
-
-		for _, project := range projects {
-			if exist, err := pathutil.IsPathExists(project); err != nil {
-				failf("Failed to check if path (%s) exist, error: %s", project, err)
-			} else if !exist {
-				log.Warnf("skip recreating user schemes for: %s, issue: file not exists", project)
-				continue
-			}
-
-			log.Printf("recreating user schemes for: %s", project)
-
-			if err := schemes.ReCreateProjectUserSchemes(project); err != nil {
-				failf("Failed to recreate user schemes for project (%s), error: %s", project, err)
-			}
-		}
-
-	} else {
-		log.Printf("recreating user schemes for: %s", configs.ProjectPath)
-		err = schemes.ReCreateProjectUserSchemes(configs.ProjectPath)
-	}
-
-	if err != nil {
-		failf("Failed to recreate user schemes, error: %s", err)
+	if err := schemes.ReCreateSchemes(configs.ProjectPath); err != nil {
+		failf("Failed to recreate schemes, error: %s", err)
 	}
 
 	// Ensure user schemes
@@ -123,13 +96,11 @@ func main() {
 	log.Infof("Ensure generated schemes")
 
 	schemes := []xcodeproj.SchemeModel{}
-
 	if isWorkspace {
 		schemes, err = xcodeproj.WorkspaceSharedSchemes(configs.ProjectPath)
 	} else {
 		schemes, err = xcodeproj.ProjectSharedSchemes(configs.ProjectPath)
 	}
-
 	if err != nil {
 		failf("Failed to list shared schemes, error: %s", err)
 	}

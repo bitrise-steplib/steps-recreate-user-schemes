@@ -1,137 +1,63 @@
 package schemes
 
 import (
-	"bufio"
-	"bytes"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
 
-	"github.com/bitrise-io/go-utils/command"
-	"github.com/bitrise-io/go-utils/errorutil"
-	"github.com/bitrise-io/go-utils/fileutil"
-	"github.com/bitrise-io/go-utils/pathutil"
+	"github.com/bitrise-io/go-utils/command/rubyscript"
 	"github.com/bitrise-tools/go-xcode/xcodeproj"
 )
 
-func runRubyScriptForOutput(scriptContent, gemfileContent, inDir string, withEnvs []string) (string, error) {
-	tmpDir, err := pathutil.NormalizedOSTempDirPath("bitrise")
+// ReCreateSchemes ....
+func ReCreateSchemes(projectOrWorkspacePth string) error {
+	runner := rubyscript.New(recreateUserSchemesRubyScriptContent)
+	bundleInstallCmd, err := runner.BundleInstallCommand(xcodeprojGemfileContent, "")
 	if err != nil {
-		return "", err
+		return fmt.Errorf("failed to create bundle install command, error: %s", err)
 	}
 
-	// Write Gemfile to file and install
-	if gemfileContent != "" {
-		gemfilePth := path.Join(tmpDir, "Gemfile")
-		if err := fileutil.WriteStringToFile(gemfilePth, gemfileContent); err != nil {
-			return "", err
-		}
-
-		cmd := command.New("bundle", "install")
-
-		if inDir != "" {
-			cmd.SetDir(inDir)
-		}
-
-		withEnvs = append(withEnvs, "BUNDLE_GEMFILE="+gemfilePth)
-		cmd.SetEnvs(withEnvs...)
-
-		var outBuffer bytes.Buffer
-		outWriter := bufio.NewWriter(&outBuffer)
-		cmd.SetStdout(outWriter)
-
-		var errBuffer bytes.Buffer
-		errWriter := bufio.NewWriter(&errBuffer)
-		cmd.SetStderr(errWriter)
-
-		if err := cmd.Run(); err != nil {
-			if errorutil.IsExitStatusError(err) {
-				errMsg := ""
-				if errBuffer.String() != "" {
-					errMsg += fmt.Sprintf("error: %s\n", errBuffer.String())
-				}
-				if outBuffer.String() != "" {
-					errMsg += fmt.Sprintf("output: %s", outBuffer.String())
-				}
-				if errMsg == "" {
-					return "", err
-				}
-
-				return "", errors.New(errMsg)
-			}
-			return "", err
-		}
+	if out, err := bundleInstallCmd.RunAndReturnTrimmedCombinedOutput(); err != nil {
+		return fmt.Errorf("bundle install failed, output: %s, error: %s", out, err)
 	}
 
-	// Write script to file and run
-	rubyScriptPth := path.Join(tmpDir, "script.rb")
-	if err := fileutil.WriteStringToFile(rubyScriptPth, scriptContent); err != nil {
-		return "", err
+	runCmd, err := runner.RunScriptCommand()
+	if err != nil {
+		return fmt.Errorf("failed to create script runner command, error: %s", err)
 	}
 
-	var cmd *command.Model
+	envsToAppend := []string{"project_path=" + projectOrWorkspacePth}
+	envs := append(runCmd.GetCmd().Env, envsToAppend...)
 
-	if gemfileContent != "" {
-		cmd = command.New("bundle", "exec", "ruby", rubyScriptPth)
-	} else {
-		cmd = command.New("ruby", rubyScriptPth)
+	runCmd.SetEnvs(envs...)
+
+	out, err := runCmd.RunAndReturnTrimmedCombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to run ruby script, output: %s, error: %s", out, err)
 	}
 
-	if inDir != "" {
-		cmd.SetDir(inDir)
+	if out == "" {
+		return nil
 	}
 
-	if len(withEnvs) > 0 {
-		cmd.SetEnvs(withEnvs...)
+	// OutputModel ...
+	type OutputModel struct {
+		Error string `json:"error"`
+	}
+	var output OutputModel
+	if err := json.Unmarshal([]byte(out), &output); err != nil {
+		return fmt.Errorf("failed to unmarshal output: %s", out)
 	}
 
-	var outBuffer bytes.Buffer
-	outWriter := bufio.NewWriter(&outBuffer)
-	cmd.SetStdout(outWriter)
-
-	var errBuffer bytes.Buffer
-	errWriter := bufio.NewWriter(&errBuffer)
-	cmd.SetStderr(errWriter)
-
-	if err := cmd.Run(); err != nil {
-		if errorutil.IsExitStatusError(err) {
-			errMsg := ""
-			if errBuffer.String() != "" {
-				errMsg += fmt.Sprintf("error: %s\n", errBuffer.String())
-			}
-			if outBuffer.String() != "" {
-				errMsg += fmt.Sprintf("output: %s", outBuffer.String())
-			}
-			if errMsg == "" {
-				return "", err
-			}
-
-			return "", errors.New(errMsg)
-		}
-		return "", err
+	if output.Error != "" {
+		return fmt.Errorf("failed to get provisioning profile - bundle id mapping, error: %s", output.Error)
 	}
 
-	return outBuffer.String(), nil
-}
-
-func runRubyScript(scriptContent, gemfileContent, inDir string, withEnvs []string) error {
-	_, err := runRubyScriptForOutput(scriptContent, gemfileContent, inDir, withEnvs)
-	return err
-}
-
-// ReCreateProjectUserSchemes ....
-func ReCreateProjectUserSchemes(projectPth string) error {
-	projectDir := filepath.Dir(projectPth)
-
-	projectBase := filepath.Base(projectPth)
-	envs := append(os.Environ(), "project_path="+projectBase, "LC_ALL=en_US.UTF-8")
-
-	return runRubyScript(recreateUserSchemesRubyScriptContent, xcodeprojGemfileContent, projectDir, envs)
+	return nil
 }
 
 func filesInDir(dir string) ([]string, error) {
