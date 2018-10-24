@@ -1,4 +1,4 @@
-format_version: "2"
+format_version: 6
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 app:
@@ -12,15 +12,23 @@ app:
 workflows:
   test:
     before_run:
-    - go-tests
+    - audit-this-step
+    steps:
+    - go-list:
+    - golint:
+    - errcheck:
+    - go-test:
     after_run:
     - cocoapods-test
     - missing-schemes-test
     - existing-schemes-test
+    - missing-schemes-test-tvos
+    - existing-schemes-test-tvos
 
   cocoapods-test:
     envs:
     - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/sample-apps-ios-cocoapods-no-shared-schemes.git
+    - BRANCH: master
     - PROJECT_PATH: SampleAppWithCocoapods/SampleAppWithCocoapods.xcworkspace
     after_run:
     - _common
@@ -28,6 +36,7 @@ workflows:
   missing-schemes-test:
     envs:
     - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/ios-no-shared-schemes.git
+    - BRANCH: master
     - PROJECT_PATH: BitriseXcode7Sample.xcodeproj
     after_run:
     - _common
@@ -35,7 +44,24 @@ workflows:
   existing-schemes-test:
     envs:
     - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/sample-apps-ios-simple-objc.git
+    - BRANCH: master
     - PROJECT_PATH: ios-simple-objc/ios-simple-objc.xcodeproj
+    after_run:
+    - _common
+
+  missing-schemes-test-tvos:
+    envs:
+    - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/sample-apps-tvos-swift.git
+    - BRANCH: no_shared_scheme
+    - PROJECT_PATH: NPO Live.xcworkspace
+    after_run:
+    - _common
+
+  existing-schemes-test-tvos:
+    envs:
+    - SAMPLE_REPOSITORY: https://github.com/bitrise-samples/sample-apps-tvos-swift.git
+    - BRANCH: master
+    - PROJECT_PATH: NPO Live.xcworkspace
     after_run:
     - _common
 
@@ -54,16 +80,10 @@ workflows:
         inputs:
         - path: _tmp
         - is_create_path: true
-    - git-clone:
-        run_if: true
+    - script:
+        title: Clone sample app
         inputs:
-        - repository_url: $SAMPLE_REPOSITORY
-        - clone_into_dir: ./
-        - commit: ""
-        - tag: ""
-        - branch: "master"
-        - pull_request_id: ""
-        - clone_depth: ""        
+        - content: git clone -b $BRANCH $SAMPLE_REPOSITORY . && cd
     - path::./:
         title: Step Test
         inputs:
