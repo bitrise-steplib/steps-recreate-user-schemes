@@ -82,7 +82,7 @@ func main() {
 	// Generate schemes
 	fmt.Println()
 	log.Errorf("No shared schemes found...")
-	log.Errorf("The newly generated schemes, may differs from the ones in your project.")
+	log.Errorf("The newly generated schemes, may differ from the ones in your project.")
 	log.Errorf("Make sure to share your schemes, to have the expected behaviour.")
 
 	fmt.Println()
