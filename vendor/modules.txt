@@ -1,0 +1,21 @@
+# github.com/bitrise-io/go-steputils v0.0.0-20210527075147-910ce7a105a1
+## explicit
+github.com/bitrise-io/go-steputils/command/rubyscript
+github.com/bitrise-io/go-steputils/input
+# github.com/bitrise-io/go-utils v0.0.0-20210520073355-367fa34178f5
+## explicit
+github.com/bitrise-io/go-utils/colorstring
+github.com/bitrise-io/go-utils/command
+github.com/bitrise-io/go-utils/errorutil
+github.com/bitrise-io/go-utils/fileutil
+github.com/bitrise-io/go-utils/log
+github.com/bitrise-io/go-utils/pathutil
+# github.com/bitrise-io/go-xcode v0.0.0-20210602133333-d2c17ac1ee9b
+## explicit
+github.com/bitrise-io/go-xcode/plistutil
+github.com/bitrise-io/go-xcode/xcodeproj
+github.com/bitrise-io/go-xcode/xcodeproject/xcscheme
+# github.com/pkg/errors v0.9.1
+github.com/pkg/errors
+# howett.net/plist v0.0.0-20201203080718-1454fab16a06
+howett.net/plist

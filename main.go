@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bitrise-io/go-steputils/input"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
+	"github.com/bitrise-io/go-xcode/xcodeproj"
 	"github.com/bitrise-steplib/steps-recreate-user-schemes/schemes"
-	"github.com/bitrise-tools/go-steputils/input"
-	"github.com/bitrise-tools/go-xcode/xcodeproj"
 )
 
 // ConfigsModel ...

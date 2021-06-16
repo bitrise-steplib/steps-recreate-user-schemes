@@ -16,7 +16,7 @@ import (
 	"github.com/bitrise-io/go-utils/errorutil"
 	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/pathutil"
-	"github.com/bitrise-tools/go-xcode/xcodeproj"
+	"github.com/bitrise-io/go-xcode/xcodeproj"
 )
 
 func runRubyScriptForOutput(scriptContent, gemfileContent, inDir string, withEnvs []string) (string, error) {
