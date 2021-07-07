@@ -180,7 +180,7 @@ func main() {
 		for _, scheme := range schemes {
 			if scheme.IsShared {
 				sharedSchemes = append(sharedSchemes, scheme)
-				log.Printf(colorstring.Green(fmt.Sprintf("- %s (Shared in %s)", scheme.Name, filepath.Base(container))))
+				log.Printf("- %s (Shared, %s)", scheme.Name, filepath.Base(container))
 			} else {
 				log.Printf(colorstring.Yellow(fmt.Sprintf("- %s (User in %s)", scheme.Name, filepath.Base(container))))
 			}
@@ -239,7 +239,7 @@ func main() {
 			if scheme.IsShared {
 				count += 1
 				sharedSchemesGenerated = append(sharedSchemesGenerated, scheme)
-				log.Printf(colorstring.Green(fmt.Sprintf("- %s (Shared in %s)", scheme.Name, filepath.Base(container))))
+				log.Printf("- %s (Shared, %s)", scheme.Name, filepath.Base(container))
 			}
 		}
 	}
