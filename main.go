@@ -41,8 +41,7 @@ func main() {
 		failf("Error: %v", err)
 	}
 
-	// Schemes
-	log.Infof("Searching for shared Schemes...")
+	log.Infof("Collecting existing Schemes...")
 	containerToSchemes, err := container.schemes()
 	if err != nil {
 		failf("Could not list Schemes: %v", err)
@@ -51,8 +50,9 @@ func main() {
 	log.Donef("Schemes:")
 	numSharedSchemes := printSchemes(true, containerToSchemes, containerPath)
 
-	log.Printf("Found %d shared Schemes", numSharedSchemes)
 	if numSharedSchemes > 0 {
+		fmt.Println()
+		log.Donef("Found %d shared Schemes", numSharedSchemes)
 		os.Exit(0)
 	}
 
@@ -71,7 +71,7 @@ func main() {
 	}
 
 	for _, missingProject := range missingProjects {
-		log.Warnf("Skipping Project (%s), as it is not present", relativeToWorkspace(missingProject, containerPath))
+		log.Warnf("Skipping Project (%s), as it is not present", pathRelativeToWorkspace(missingProject, containerPath))
 	}
 
 	for _, project := range projects {
@@ -106,7 +106,7 @@ func main() {
 	}
 }
 
-func relativeToWorkspace(project, workspace string) string {
+func pathRelativeToWorkspace(project, workspace string) string {
 	parentDir, _ := filepath.Split(workspace)
 	relPath, err := filepath.Rel(filepath.Join(parentDir), project)
 	if err != nil {
@@ -120,11 +120,11 @@ func relativeToWorkspace(project, workspace string) string {
 func printSchemes(includeUserSchemes bool, containerToSchemes map[string][]xcscheme.Scheme, containerPath string) int {
 	var sharedSchemes []xcscheme.Scheme
 	for container, schemes := range containerToSchemes {
-		log.Printf("- %s", relativeToWorkspace(container, containerPath))
+		log.Printf("- %s", pathRelativeToWorkspace(container, containerPath))
 		for _, scheme := range schemes {
 			if scheme.IsShared {
 				sharedSchemes = append(sharedSchemes, scheme)
-				log.Printf(colorstring.Green(fmt.Sprintf("  - %s (Shared)", scheme.Name)))
+				log.Printf("  - %s (Shared)", scheme.Name)
 			} else if includeUserSchemes {
 				log.Printf(colorstring.Yellow(fmt.Sprintf("  - %s (User)", scheme.Name)))
 			}
