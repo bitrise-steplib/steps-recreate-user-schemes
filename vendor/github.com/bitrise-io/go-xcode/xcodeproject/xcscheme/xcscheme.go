@@ -83,6 +83,42 @@ type TestAction struct {
 	AdditionalOptions AdditionalOptions
 }
 
+// BuildableProductRunnable ...
+type BuildableProductRunnable struct {
+	RunnableDebuggingMode string `xml:"runnableDebuggingMode,attr"`
+	BuildableReference    BuildableReference
+}
+
+// LaunchAction ...
+type LaunchAction struct {
+	BuildConfiguration             string `xml:"buildConfiguration,attr"`
+	SelectedDebuggerIdentifier     string `xml:"selectedDebuggerIdentifier,attr"`
+	SelectedLauncherIdentifier     string `xml:"selectedLauncherIdentifier,attr"`
+	LaunchStyle                    string `xml:"launchStyle,attr"`
+	UseCustomWorkingDirectory      string `xml:"useCustomWorkingDirectory,attr"`
+	IgnoresPersistentStateOnLaunch string `xml:"ignoresPersistentStateOnLaunch,attr"`
+	DebugDocumentVersioning        string `xml:"debugDocumentVersioning,attr"`
+	DebugServiceExtension          string `xml:"debugServiceExtension,attr"`
+	AllowLocationSimulation        string `xml:"allowLocationSimulation,attr"`
+	BuildableProductRunnable       BuildableProductRunnable
+	AdditionalOptions              AdditionalOptions
+}
+
+// ProfileAction ...
+type ProfileAction struct {
+	BuildConfiguration           string `xml:"buildConfiguration,attr"`
+	ShouldUseLaunchSchemeArgsEnv string `xml:"shouldUseLaunchSchemeArgsEnv,attr"`
+	SavedToolIdentifier          string `xml:"savedToolIdentifier,attr"`
+	UseCustomWorkingDirectory    string `xml:"useCustomWorkingDirectory,attr"`
+	DebugDocumentVersioning      string `xml:"debugDocumentVersioning,attr"`
+	BuildableProductRunnable     BuildableProductRunnable
+}
+
+// AnalyzeAction ...
+type AnalyzeAction struct {
+	BuildConfiguration string `xml:"buildConfiguration,attr"`
+}
+
 // ArchiveAction ...
 type ArchiveAction struct {
 	BuildConfiguration       string `xml:"buildConfiguration,attr"`
@@ -91,11 +127,16 @@ type ArchiveAction struct {
 
 // Scheme ...
 type Scheme struct {
+	// The last known Xcode version.
 	LastUpgradeVersion string `xml:"LastUpgradeVersion,attr"`
-	Version            string `xml:"version,attr"`
+	// The version of `.xcscheme` files supported.
+	Version string `xml:"version,attr"`
 
 	BuildAction   BuildAction
 	TestAction    TestAction
+	LaunchAction  LaunchAction
+	ProfileAction ProfileAction
+	AnalyzeAction AnalyzeAction
 	ArchiveAction ArchiveAction
 
 	Name     string `xml:"-"`
