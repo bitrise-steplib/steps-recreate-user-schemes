@@ -100,7 +100,7 @@ func main() {
 
 	fmt.Println()
 	if numGenSharedSchemes > 0 {
-		log.Donef("%d new Schemes added.", numGenSharedSchemes)
+		log.Donef("Count of new shared Schemes: %d", numGenSharedSchemes)
 	} else {
 		log.Warnf("No new Schemes created.")
 	}
