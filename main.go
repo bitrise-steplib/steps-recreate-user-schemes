@@ -52,7 +52,7 @@ func main() {
 
 	if numSharedSchemes > 0 {
 		fmt.Println()
-		log.Donef("Found %d shared Schemes", numSharedSchemes)
+		log.Donef("Found %d shared Scheme(s)", numSharedSchemes)
 		os.Exit(0)
 	}
 
@@ -100,7 +100,7 @@ func main() {
 
 	fmt.Println()
 	if numGenSharedSchemes > 0 {
-		log.Donef("Count of new shared Schemes: %d", numGenSharedSchemes)
+		log.Donef("Number of new shared Schemes: %d", numGenSharedSchemes)
 	} else {
 		log.Warnf("No new Schemes created.")
 	}

@@ -83,6 +83,7 @@ workflows:
       - TEST_APP_URL: https://github.com/bitrise-samples/sample-apps-ios-simple-objc.git
       - TEST_APP_BRANCH: master
       - BITRISE_PROJECT_PATH: ios-simple-objc/ios-simple-objc.xcodeproj
+      - BITRISE_SCHEME: ios-simple-objc
       - SHOULD_REMOVE_SCHEMES: true
     after_run:
       - _run
