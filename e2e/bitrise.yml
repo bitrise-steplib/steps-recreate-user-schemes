@@ -1,6 +1,17 @@
 format_version: "11"
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
+app:
+  envs:
+    # Shared test configs
+    - BITRISE_KEYCHAIN_PATH: $HOME/Library/Keychains/login.keychain
+    # Shared test secrets
+    - BITRISE_KEYCHAIN_PASSWORD: $BITRISE_KEYCHAIN_PASSWORD
+    - APPLE_CERTIFICATE_URL_LIST: $APPLE_CERTIFICATE_URL_LIST
+    - APPLE_CERTIFICATE_PASSHRASE_LIST: $APPLE_CERTIFICATE_PASSHRASE_LIST
+    - APPSTORECONNECT_API_KEY_URL: $APPSTORECONNECT_API_KEY_URL
+    - APPSTORECONNECT_API_KEY_ISSUER: $APPSTORECONNECT_API_KEY_ISSUER
+
 workflows:
   test_existing_schemes_xcode13:
     before_run:
@@ -136,6 +147,19 @@ workflows:
           title: Step Test
           inputs:
             - project_path: ./_tmp/$BITRISE_PROJECT_PATH
+      - ios-auto-provision-appstoreconnect:
+          run_if: '{{ not (enveq "BITRISE_SCHEME" "") | and $.IsCI }}'
+          inputs:
+            - api_key_path: $APPSTORECONNECT_API_KEY_URL
+            - api_issuer: $APPSTORECONNECT_API_KEY_ISSUER
+            - certificate_urls: $APPLE_CERTIFICATE_URL_LIST
+            - passphrases: $APPLE_CERTIFICATE_PASSHRASE_LIST
+            - project_path: "./_tmp/$BITRISE_PROJECT_PATH"
+            - scheme: $BITRISE_SCHEME
+            - sign_uitest_targets: "yes"
+            - keychain_path: $BITRISE_KEYCHAIN_PATH
+            - keychain_password: $BITRISE_KEYCHAIN_PASSWORD
+            - verbose_log: "yes"
       - xcode-build-for-test:
           run_if: '{{ not (enveq "BITRISE_SCHEME" "")}}'
           inputs:
