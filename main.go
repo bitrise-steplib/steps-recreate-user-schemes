@@ -168,27 +168,11 @@ func main() {
 	}
 
 	fmt.Println()
-	log.Donef("Projects:")
-	for container := range containerToSchemes {
-		log.Printf("- %s", relativeToWorkspace(container, configs.ProjectPath))
-	}
-
-	fmt.Println()
 	log.Donef("Schemes:")
-	var sharedSchemes []xcscheme.Scheme
-	for container, schemes := range containerToSchemes {
-		for _, scheme := range schemes {
-			if scheme.IsShared {
-				sharedSchemes = append(sharedSchemes, scheme)
-				log.Printf("- %s (Shared, %s)", scheme.Name, filepath.Base(container))
-			} else {
-				log.Printf(colorstring.Yellow(fmt.Sprintf("- %s (User in %s)", scheme.Name, filepath.Base(container))))
-			}
-		}
-	}
+	numSharedSchemes := printSchemes(true, containerToSchemes, configs.ProjectPath)
 
-	log.Printf("Shared scheme count: %d", len(sharedSchemes))
-	if len(sharedSchemes) > 0 {
+	log.Printf("Shared scheme count: %d", numSharedSchemes)
+	if numSharedSchemes > 0 {
 		os.Exit(0)
 	}
 
@@ -212,8 +196,12 @@ func main() {
 
 	for _, project := range projects {
 		log.Printf("Recreating schemes for: %s", filepath.Base(project.Path))
-		if err := project.ReCreateSharedSchemes(); err != nil {
-			failf("Failed to recreate schemes for project (%s): %v", filepath.Base(project.Path), err)
+		schemes := project.ReCreateSchemes()
+
+		for _, scheme := range schemes {
+			if err := project.SaveSharedScheme(scheme); err != nil {
+				failf("Faield to save Scheme: %v", err)
+			}
 		}
 	}
 
@@ -232,19 +220,9 @@ func main() {
 
 	fmt.Println()
 	log.Donef("Generated shared Schemes:")
-	var sharedSchemesGenerated []xcscheme.Scheme
-	var count int
-	for container, schemes := range containerToSchemesNew {
-		for _, scheme := range schemes {
-			if scheme.IsShared {
-				count += 1
-				sharedSchemesGenerated = append(sharedSchemesGenerated, scheme)
-				log.Printf("- %s (Shared, %s)", scheme.Name, filepath.Base(container))
-			}
-		}
-	}
+	numGenSharedSchemes := printSchemes(false, containerToSchemesNew, configs.ProjectPath)
 
-	log.Printf("Generated shared Scheme count: %d", count)
+	log.Printf("Generated shared Scheme count: %d", numGenSharedSchemes)
 }
 
 func relativeToWorkspace(project, workspace string) string {
@@ -280,4 +258,21 @@ func openContainer(path string) (container, error) {
 		xcodeproject.XcodeProjExtension,
 		xcworkspace.XCWorkspaceExtension,
 	)
+}
+
+func printSchemes(includeUserSchemes bool, containerToSchemes map[string][]xcscheme.Scheme, containerPath string) int {
+	var sharedSchemes []xcscheme.Scheme
+	for container, schemes := range containerToSchemes {
+		log.Printf("- %s", relativeToWorkspace(container, containerPath))
+		for _, scheme := range schemes {
+			if scheme.IsShared {
+				sharedSchemes = append(sharedSchemes, scheme)
+				log.Printf(colorstring.Green(fmt.Sprintf("  - %s (Shared)", scheme.Name)))
+			} else if includeUserSchemes {
+				log.Printf(colorstring.Yellow(fmt.Sprintf("  - %s (User)", scheme.Name)))
+			}
+		}
+	}
+
+	return len(sharedSchemes)
 }
