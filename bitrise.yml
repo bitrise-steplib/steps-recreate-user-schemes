@@ -12,11 +12,6 @@ workflows:
           inputs:
             - workflow: e2e
 
-  test:
-    after_run:
-      - check
-      - e2e
-
   sample:
     envs:
       - TEST_APP_URL: https://github.com/bitrise-samples/sample-apps-ios-cocoapods-no-shared-schemes.git
