@@ -47,7 +47,7 @@ func main() {
 		failf("Could not list Schemes: %v", err)
 	}
 
-	log.Donef("Schemes:")
+	log.Printf("Schemes:")
 	printSchemes(true, containerToSchemes, containerPath)
 	preexistingSharedSchemes := numberOfSharedSchemes(containerToSchemes)
 
@@ -64,7 +64,7 @@ func main() {
 	log.Errorf("Make sure to share your Schemes, to prevent unexpected behaviour.")
 
 	fmt.Println()
-	log.Infof("Generating Schemes")
+	log.Infof("Generating Schemes...")
 
 	projects, missingProjects, err := container.projects()
 	if err != nil {
@@ -103,7 +103,7 @@ func main() {
 	}
 
 	fmt.Println()
-	log.Infof("Created Schemes:")
+	log.Printf("Created Schemes:")
 	printSchemes(false, containerToSchemesNew, containerPath)
 
 	fmt.Println()
