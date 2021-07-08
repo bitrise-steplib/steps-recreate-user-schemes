@@ -48,11 +48,12 @@ func main() {
 	}
 
 	log.Donef("Schemes:")
-	numSharedSchemes := printSchemes(true, containerToSchemes, containerPath)
+	printSchemes(true, containerToSchemes, containerPath)
+	preexistingSharedSchemes := numberOfSharedSchemes(containerToSchemes)
 
-	if numSharedSchemes > 0 {
+	if preexistingSharedSchemes > 0 {
 		fmt.Println()
-		log.Donef("Found %d shared Scheme(s)", numSharedSchemes)
+		log.Donef("There are %d shared Scheme(s).", preexistingSharedSchemes)
 		os.Exit(0)
 	}
 
@@ -94,16 +95,19 @@ func main() {
 		failf("Could not list Schemes: %v", err)
 	}
 
-	fmt.Println()
-	log.Infof("Created Schemes:")
-	numGenSharedSchemes := printSchemes(false, containerToSchemesNew, containerPath)
+	numberOfNewSchemes := numberOfSharedSchemes(containerToSchemesNew)
+
+	if numberOfNewSchemes == 0 {
+		fmt.Println()
+		failf("No new Schemes generated.")
+	}
 
 	fmt.Println()
-	if numGenSharedSchemes > 0 {
-		log.Donef("Number of new shared Schemes: %d", numGenSharedSchemes)
-	} else {
-		log.Warnf("No new Schemes created.")
-	}
+	log.Infof("Created Schemes:")
+	printSchemes(false, containerToSchemesNew, containerPath)
+
+	fmt.Println()
+	log.Donef("Generated %d shared Scheme(s).", numberOfNewSchemes)
 }
 
 func pathRelativeToWorkspace(project, workspace string) string {
@@ -117,19 +121,28 @@ func pathRelativeToWorkspace(project, workspace string) string {
 	return relPath
 }
 
-func printSchemes(includeUserSchemes bool, containerToSchemes map[string][]xcscheme.Scheme, containerPath string) int {
-	var sharedSchemes []xcscheme.Scheme
+func numberOfSharedSchemes(containerToSchemes map[string][]xcscheme.Scheme) int {
+	var count int
+	for _, schemes := range containerToSchemes {
+		for _, scheme := range schemes {
+			if scheme.IsShared {
+				count++
+			}
+		}
+	}
+
+	return count
+}
+
+func printSchemes(includeUserSchemes bool, containerToSchemes map[string][]xcscheme.Scheme, containerPath string) {
 	for container, schemes := range containerToSchemes {
 		log.Printf("- %s", pathRelativeToWorkspace(container, containerPath))
 		for _, scheme := range schemes {
 			if scheme.IsShared {
-				sharedSchemes = append(sharedSchemes, scheme)
 				log.Printf("  - %s (Shared)", scheme.Name)
 			} else if includeUserSchemes {
 				log.Printf(colorstring.Yellow(fmt.Sprintf("  - %s (User)", scheme.Name)))
 			}
 		}
 	}
-
-	return len(sharedSchemes)
 }
