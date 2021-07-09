@@ -15,7 +15,7 @@ github.com/bitrise-io/go-utils/pathutil
 github.com/bitrise-io/go-utils/pointers
 github.com/bitrise-io/go-utils/pretty
 github.com/bitrise-io/go-utils/sliceutil
-# github.com/bitrise-io/go-xcode v0.0.0-20210708111955-7350a09b5bb6
+# github.com/bitrise-io/go-xcode v0.0.0-20210709074524-51e136148348
 ## explicit
 github.com/bitrise-io/go-xcode/xcodeproject/serialized
 github.com/bitrise-io/go-xcode/xcodeproject/xcodebuild
