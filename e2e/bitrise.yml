@@ -2,6 +2,74 @@ format_version: "11"
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 workflows:
+  test_existing_schemes_xcode13:
+    before_run:
+      - _expose_xcode_version
+    steps:
+      - script:
+          inputs:
+          - content: |-
+              #!/bin/env bash
+              set -e
+              if [[ ${XCODE_MAJOR_VERSION} -lt 13 ]]; then
+                echo "This test case requires Xcode >= 13, skipping..."
+                exit 0
+              fi
+              envman add --key XCODE_MAJOR_VERSION_AT_LEAST_13 --value "true"
+      - bitrise-run:
+          run_if: '{{enveq "XCODE_MAJOR_VERSION_AT_LEAST_13" "true"}}'
+          inputs:
+          - workflow_id: utility_test_existing_schemes_xcode13
+          - bitrise_config_path: ./e2e/bitrise.yml
+
+  utility_test_existing_schemes_xcode13:
+    envs:
+      - TEST_APP_URL: https://github.com/bitrise-io/sample-xcode-13-empty.git
+      - TEST_APP_BRANCH: main
+      - BITRISE_PROJECT_PATH: "sample-xcode-13-empty.xcodeproj"
+      - BITRISE_SCHEME: sample-xcode-13-empty
+    after_run:
+      - _run
+
+  test_missing_schemes_xcode13:
+    before_run:
+      - _expose_xcode_version
+    steps:
+      - script:
+          inputs:
+          - content: |-
+              #!/bin/env bash
+              set -e
+              if [[ ${XCODE_MAJOR_VERSION} -lt 13 ]]; then
+                echo "This test case requires Xcode >= 13, skipping..."
+                exit 0
+              fi
+              envman add --key XCODE_MAJOR_VERSION_AT_LEAST_13 --value "true"
+      - bitrise-run:
+          run_if: '{{enveq "XCODE_MAJOR_VERSION_AT_LEAST_13" "true"}}'
+          inputs:
+          - workflow_id: utility_test_missing_schemes_xcode13
+          - bitrise_config_path: ./e2e/bitrise.yml
+
+  utility_test_missing_schemes_xcode13:
+    envs:
+      - TEST_APP_URL: https://github.com/bitrise-io/sample-xcode-13-empty.git
+      - TEST_APP_BRANCH: main
+      - BITRISE_PROJECT_PATH: "sample-xcode-13-empty.xcodeproj"
+      - SHOULD_REMOVE_SCHEMES: true
+      - BITRISE_SCHEME: sample-xcode-13-empty
+    after_run:
+      - _run
+
+  test_parallel_ui_test:
+    envs:
+    - TEST_APP_URL: https://github.com/bitrise-io/sample-swift-project-with-parallel-ui-test.git
+    - TEST_APP_BRANCH: master
+    - BITRISE_PROJECT_PATH: BullsEye.xcworkspace
+    - SHOULD_REMOVE_SCHEMES: true
+    after_run:
+      - _run
+
   test_cocoapods:
     envs:
       - TEST_APP_URL: https://github.com/bitrise-samples/sample-apps-ios-cocoapods-no-shared-schemes.git
@@ -12,9 +80,11 @@ workflows:
 
   test_missing_schemes:
     envs:
-      - TEST_APP_URL: https://github.com/bitrise-samples/ios-no-shared-schemes.git
+      - TEST_APP_URL: https://github.com/bitrise-samples/sample-apps-ios-simple-objc.git
       - TEST_APP_BRANCH: master
-      - BITRISE_PROJECT_PATH: BitriseXcode7Sample.xcodeproj
+      - BITRISE_PROJECT_PATH: ios-simple-objc/ios-simple-objc.xcodeproj
+      - BITRISE_SCHEME: ios-simple-objc
+      - SHOULD_REMOVE_SCHEMES: true
     after_run:
       - _run
 
@@ -47,7 +117,6 @@ workflows:
       - script:
           inputs:
             - content: |-
-                #!/bin/bash
                 set -e
                 set -v
                 rm -rf _tmp
@@ -57,7 +126,42 @@ workflows:
             - repository_url: $TEST_APP_URL
             - branch: $TEST_APP_BRANCH
             - clone_into_dir: ./_tmp
+      - script:
+          run_if: '{{ enveq "SHOULD_REMOVE_SCHEMES" "true"}}'
+          inputs:
+          - content: |-
+              set -ex
+              find . -type f -path "./_tmp/*" -name "*.xcscheme" -exec rm {} \;
       - path::./:
           title: Step Test
           inputs:
             - project_path: ./_tmp/$BITRISE_PROJECT_PATH
+      - xcode-test:
+          run_if: '{{ not (enveq "BITRISE_SCHEME" "")}}'
+          inputs:
+            - project_path: ./_tmp/$BITRISE_PROJECT_PATH
+
+  _expose_xcode_version:
+    steps:
+    - script:
+        title: Expose Xcode major version
+        inputs:
+        - content: |-
+            #!/bin/env bash
+            set -e
+
+            if [[ ! -z "$XCODE_MAJOR_VERSION" ]]; then
+              echo "Xcode major version already exposed: $XCODE_MAJOR_VERSION"
+              exit 0
+            fi
+
+            version=`xcodebuild -version`
+            regex="Xcode ([0-9]*)."
+            if [[ ! $version =~ $regex ]]; then
+              echo "Failed to determine Xcode major version"
+              exit 1
+            fi
+
+            xcode_major_version=${BASH_REMATCH[1]}
+            echo "Xcode major version: $xcode_major_version"
+            envman add --key XCODE_MAJOR_VERSION --value $xcode_major_version

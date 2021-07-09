@@ -3,36 +3,18 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
-	"github.com/bitrise-io/go-steputils/input"
+	"github.com/bitrise-io/go-steputils/stepconf"
+	"github.com/bitrise-io/go-utils/colorstring"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
-	"github.com/bitrise-io/go-xcode/xcodeproj"
-	"github.com/bitrise-steplib/steps-recreate-user-schemes/schemes"
+	"github.com/bitrise-io/go-xcode/xcodeproject/xcscheme"
 )
 
-// ConfigsModel ...
-type ConfigsModel struct {
-	ProjectPath string
-}
-
-func createConfigsModelFromEnvs() ConfigsModel {
-	return ConfigsModel{
-		ProjectPath: os.Getenv("project_path"),
-	}
-}
-
-func (configs ConfigsModel) print() {
-	log.Infof("Configs:")
-	log.Printf("- ProjectPath: %s", configs.ProjectPath)
-}
-
-func (configs ConfigsModel) validate() error {
-	if err := input.ValidateIfPathExists(configs.ProjectPath); err != nil {
-		return fmt.Errorf("ProjectPath - %s", err)
-	}
-
-	return nil
+// Input ...
+type Input struct {
+	ProjectPath string `env:"project_path,file"`
 }
 
 func failf(format string, v ...interface{}) {
@@ -41,108 +23,126 @@ func failf(format string, v ...interface{}) {
 }
 
 func main() {
-	configs := createConfigsModelFromEnvs()
-	configs.print()
+	var config Input
+	if err := stepconf.Parse(&config); err != nil {
+		failf("Invalid Input: %v", err)
+	}
 
+	stepconf.Print(config)
 	fmt.Println()
 
-	if err := configs.validate(); err != nil {
-		failf("Issue with input: %s", err)
-	}
-
-	// Shared schemes
-	isWorkspace := xcodeproj.IsXCWorkspace(configs.ProjectPath)
-	sharedSchemes := []xcodeproj.SchemeModel{}
-	var err error
-
-	if isWorkspace {
-		log.Infof("Searching for workspace shared schemes...")
-		sharedSchemes, err = xcodeproj.WorkspaceSharedSchemes(configs.ProjectPath)
-	} else {
-		log.Infof("Searching for project shared schemes...")
-		sharedSchemes, err = xcodeproj.ProjectSharedSchemes(configs.ProjectPath)
-	}
-
+	containerPath, err := pathutil.AbsPath(config.ProjectPath)
 	if err != nil {
-		failf("Failed to list shared schemes, error: %s", err)
+		failf("Failed to convert Project or Workspace path to absolute path: %v", err)
 	}
 
-	log.Printf("shared scheme count: %d", len(sharedSchemes))
+	container, err := openContainer(containerPath)
+	if err != nil {
+		failf("Error: %v", err)
+	}
 
-	if len(sharedSchemes) > 0 {
+	log.Infof("Collecting existing Schemes...")
+	containerToSchemes, err := container.schemes()
+	if err != nil {
+		failf("Could not list Schemes: %v", err)
+	}
+
+	log.Printf("Schemes:")
+	printSchemes(true, containerToSchemes, containerPath)
+	preexistingSharedSchemes := numberOfSharedSchemes(containerToSchemes)
+
+	if preexistingSharedSchemes > 0 {
 		fmt.Println()
-		log.Donef("Shared schemes:")
-		for _, scheme := range sharedSchemes {
-			log.Printf("- %s", scheme.Name)
-		}
-
+		log.Donef("There are %d shared Scheme(s).", preexistingSharedSchemes)
 		os.Exit(0)
 	}
 
 	// Generate schemes
 	fmt.Println()
-	log.Errorf("No shared schemes found...")
-	log.Errorf("The newly generated schemes, may differs from the ones in your project.")
-	log.Errorf("Make sure to share your schemes, to have the expected behaviour.")
+	log.Errorf("No shared Schemes found...")
+	log.Errorf("The newly generated Schemes may differ from the ones in your Project.")
+	log.Errorf("Make sure to share your Schemes, to prevent unexpected behaviour.")
 
 	fmt.Println()
-	log.Infof("Generating user schemes")
+	log.Infof("Generating Schemes...")
 
-	if isWorkspace {
-		projects, err := xcodeproj.WorkspaceProjectReferences(configs.ProjectPath)
-		if err != nil {
-			failf("Failed to get workspace referred projects, error: %s", err)
-		}
+	projects, missingProjects, err := container.projects()
+	if err != nil {
+		failf("Error: %v", err)
+	}
 
-		for _, project := range projects {
-			if exist, err := pathutil.IsPathExists(project); err != nil {
-				failf("Failed to check if path (%s) exist, error: %s", project, err)
-			} else if !exist {
-				log.Warnf("skip recreating user schemes for: %s, issue: file not exists", project)
-				continue
-			}
+	for _, missingProject := range missingProjects {
+		log.Warnf("Skipping Project (%s), as it is not present", pathRelativeToWorkspace(missingProject, containerPath))
+	}
 
-			log.Printf("recreating user schemes for: %s", project)
+	for _, project := range projects {
+		log.Printf("Recreating Schemes for: %s", filepath.Base(project.Path))
+		schemes := project.ReCreateSchemes()
 
-			if err := schemes.ReCreateProjectUserSchemes(project); err != nil {
-				failf("Failed to recreate user schemes for project (%s), error: %s", project, err)
+		for _, scheme := range schemes {
+			if err := project.SaveSharedScheme(scheme); err != nil {
+				failf("Failed to save Scheme: %v", err)
 			}
 		}
-
-	} else {
-		log.Printf("recreating user schemes for: %s", configs.ProjectPath)
-		err = schemes.ReCreateProjectUserSchemes(configs.ProjectPath)
 	}
 
+	container, err = openContainer(containerPath)
 	if err != nil {
-		failf("Failed to recreate user schemes, error: %s", err)
+		failf("Error: %v", err)
 	}
-
-	// Ensure user schemes
-	fmt.Println()
-	log.Infof("Ensure generated schemes")
-
-	schemes := []xcodeproj.SchemeModel{}
-
-	if isWorkspace {
-		schemes, err = xcodeproj.WorkspaceSharedSchemes(configs.ProjectPath)
-	} else {
-		schemes, err = xcodeproj.ProjectSharedSchemes(configs.ProjectPath)
-	}
-
+	containerToSchemesNew, err := container.schemes()
 	if err != nil {
-		failf("Failed to list shared schemes, error: %s", err)
+		failf("Could not list Schemes: %v", err)
 	}
 
-	log.Printf("generated scheme count: %d", len(schemes))
+	numberOfNewSchemes := numberOfSharedSchemes(containerToSchemesNew)
 
-	if len(schemes) == 0 {
-		failf("No schemes generated")
+	if numberOfNewSchemes == 0 {
+		fmt.Println()
+		failf("No new Schemes generated.")
 	}
 
 	fmt.Println()
-	log.Donef("Generated schemes:")
-	for _, scheme := range schemes {
-		log.Printf("- %s", scheme.Name)
+	log.Printf("Created Schemes:")
+	printSchemes(false, containerToSchemesNew, containerPath)
+
+	fmt.Println()
+	log.Donef("Generated %d shared Scheme(s).", numberOfNewSchemes)
+}
+
+func pathRelativeToWorkspace(project, workspace string) string {
+	parentDir, _ := filepath.Split(workspace)
+	relPath, err := filepath.Rel(filepath.Join(parentDir), project)
+	if err != nil {
+		log.Warnf("%s", err)
+		return project
+	}
+
+	return relPath
+}
+
+func numberOfSharedSchemes(containerToSchemes map[string][]xcscheme.Scheme) int {
+	var count int
+	for _, schemes := range containerToSchemes {
+		for _, scheme := range schemes {
+			if scheme.IsShared {
+				count++
+			}
+		}
+	}
+
+	return count
+}
+
+func printSchemes(includeUserSchemes bool, containerToSchemes map[string][]xcscheme.Scheme, containerPath string) {
+	for container, schemes := range containerToSchemes {
+		log.Printf("- %s", pathRelativeToWorkspace(container, containerPath))
+		for _, scheme := range schemes {
+			if scheme.IsShared {
+				log.Printf("  - %s (Shared)", scheme.Name)
+			} else if includeUserSchemes {
+				log.Printf(colorstring.Yellow(fmt.Sprintf("  - %s (User)", scheme.Name)))
+			}
+		}
 	}
 }
