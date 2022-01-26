@@ -26,7 +26,7 @@ toolkit:
   go:
     package_name: github.com/bitrise-steplib/steps-recreate-user-schemes
 inputs:
-- project_path:
+- project_path: $BITRISE_PROJECT_PATH
   opts:
     title: Project or Workspace path
     summary: A `.xcodeproj/.xcworkspace` path.
