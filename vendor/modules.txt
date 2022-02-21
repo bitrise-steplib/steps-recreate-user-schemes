@@ -1,7 +1,5 @@
 # github.com/bitrise-io/go-plist v0.0.0-20210301100253-4b1a112ccd10
 github.com/bitrise-io/go-plist
-# github.com/bitrise-io/go-steputils v1.0.1
-## explicit
 # github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.1
 ## explicit
 github.com/bitrise-io/go-steputils/v2/stepconf
@@ -18,6 +16,7 @@ github.com/bitrise-io/go-utils/pointers
 github.com/bitrise-io/go-utils/pretty
 github.com/bitrise-io/go-utils/sliceutil
 # github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.1
+## explicit
 github.com/bitrise-io/go-utils/v2/env
 # github.com/bitrise-io/go-xcode v1.0.2
 ## explicit

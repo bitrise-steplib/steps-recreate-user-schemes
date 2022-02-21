@@ -54,6 +54,7 @@ func (g SchemeGenerator) Run(cfg Config) error {
 		return fmt.Errorf("opening container failed: %w", err)
 	}
 
+	fmt.Println()
 	log.Infof("Collecting existing Schemes...")
 	containerToSchemes, err := container.schemes()
 	if err != nil {
