@@ -22,12 +22,12 @@ type projectContainer struct {
 
 func newProject(path string) (projectContainer, error) {
 	if !xcodeproject.IsXcodeProj(path) {
-		return projectContainer{}, fmt.Errorf("path (%s) is not a Project", path)
+		return projectContainer{}, fmt.Errorf("%s is not an Xcode Project", path)
 	}
 
 	project, err := xcodeproject.Open(path)
 	if err != nil {
-		return projectContainer{}, fmt.Errorf("failed to open Project (%s): %v", path, err)
+		return projectContainer{}, fmt.Errorf("opening the Xcode Project at %s failed: %w", path, err)
 	}
 
 	return projectContainer{
@@ -38,7 +38,7 @@ func newProject(path string) (projectContainer, error) {
 func (p projectContainer) schemes() (map[string][]xcscheme.Scheme, error) {
 	projectSchemes, err := p.project.Schemes()
 	if err != nil {
-		return nil, fmt.Errorf("failed to list Schemes in Project (%s): %v", p.project.Path, err)
+		return nil, fmt.Errorf("listing Schemes in Xcode Project at %s failed: %w", p.project.Path, err)
 	}
 
 	containerToSchemes := make(map[string][]xcscheme.Scheme)
@@ -58,12 +58,12 @@ type workspaceContainer struct {
 
 func newWorkspace(path string) (workspaceContainer, error) {
 	if !xcworkspace.IsWorkspace(path) {
-		return workspaceContainer{}, fmt.Errorf("path (%s) is not a Workspace", path)
+		return workspaceContainer{}, fmt.Errorf("%s is not an Xcode Workspace", path)
 	}
 
 	workspace, err := xcworkspace.Open(path)
 	if err != nil {
-		return workspaceContainer{}, fmt.Errorf("failed to open Workspace (%s): %v", path, err)
+		return workspaceContainer{}, fmt.Errorf("opening the Xcode Workspace at %s failed: %w", path, err)
 	}
 
 	return workspaceContainer{
@@ -74,7 +74,7 @@ func newWorkspace(path string) (workspaceContainer, error) {
 func (w workspaceContainer) schemes() (map[string][]xcscheme.Scheme, error) {
 	containerToSchemes, err := w.workspace.Schemes()
 	if err != nil {
-		return nil, fmt.Errorf("failed to list Schemes in Workspace (%s): %v", w.workspace.Path, err)
+		return nil, fmt.Errorf("listing Schemes in Xcode Workspace at %s failed: %w", w.workspace.Path, err)
 	}
 
 	return containerToSchemes, nil
@@ -90,7 +90,7 @@ func (w workspaceContainer) projects() ([]xcodeproject.XcodeProj, []string, erro
 	var missingProjects []string
 	for _, projPath := range projPaths {
 		if exist, err := pathutil.IsPathExists(projPath); err != nil {
-			return nil, nil, fmt.Errorf("failed to list Projects in the Workspace (%s), can not check if path (%s) exists: %v", w.workspace.Path, projPath, err)
+			return nil, nil, fmt.Errorf("list Xcode Projects in the Workspace at %s failed: can not check if path (%s) exists: %w", w.workspace.Path, projPath, err)
 		} else if !exist {
 			missingProjects = append(missingProjects, projPath)
 			continue
@@ -98,7 +98,7 @@ func (w workspaceContainer) projects() ([]xcodeproject.XcodeProj, []string, erro
 
 		project, err := xcodeproject.Open(projPath)
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to open Project (%s) in the Workspace (%s): %v", projPath, w.workspace.Path, err)
+			return nil, nil, fmt.Errorf("opening the Xcode Project (%s) in the Workspace at %s failed: %w", projPath, w.workspace.Path, err)
 		}
 
 		projects = append(projects, project)
@@ -111,14 +111,14 @@ func openContainer(path string) (container, error) {
 	if xcodeproject.IsXcodeProj(path) {
 		container, err := newProject(path)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open Project: %v", err)
+			return nil, fmt.Errorf("failed to open Xcode Project: %w", err)
 		}
 
 		return container, nil
 	} else if xcworkspace.IsWorkspace(path) {
 		container, err := newWorkspace(path)
 		if err != nil {
-			return nil, fmt.Errorf("failed to open Workspace: %v", err)
+			return nil, fmt.Errorf("failed to open Xcode Workspace: %w", err)
 		}
 
 		return container, nil
