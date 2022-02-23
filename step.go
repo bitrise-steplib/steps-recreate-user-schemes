@@ -85,7 +85,7 @@ func (g SchemeGenerator) Run(cfg Config) error {
 	}
 
 	for _, missingProject := range missingProjects {
-		log.Warnf("Skipping Project (%s), as it is not present", pathRelativeToWorkspace(missingProject, cfg.ContainerPath))
+		log.Warnf("Skipping project (%s), as it is not present", pathRelativeToWorkspace(missingProject, cfg.ContainerPath))
 	}
 
 	for _, project := range projects {
