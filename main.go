@@ -16,13 +16,13 @@ func run() int {
 	s := createStep()
 	cfg, err := s.ProcessConfig()
 	if err != nil {
-		log.Errorf("Process config failed: %s", err)
+		log.Errorf("Process config: %s", err)
 		return 1
 
 	}
 
 	if err := s.Run(cfg); err != nil {
-		log.Errorf("Run failed: %s", err)
+		log.Errorf("Run: %s", err)
 		return 1
 	}
 
