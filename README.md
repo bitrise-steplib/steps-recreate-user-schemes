@@ -9,8 +9,7 @@ Recreate User Schemes
 
 This step recreates default user schemes.
 
-If no shared schemes exist in the project/workspace, step will recreate default user schemes, 
-just like Xcode does. 
+If no shared schemes exist in the project/workspace, step will recreate default user schemes, just like Xcode does.
 </details>
 
 ## 🧩 Get started
@@ -26,7 +25,7 @@ You can also run this step directly with [Bitrise CLI](https://github.com/bitris
 
 | Key | Description | Flags | Default |
 | --- | --- | --- | --- |
-| `project_path` | A `.xcodeproj/.xcworkspace` path.  | required |  |
+| `project_path` | A `.xcodeproj/.xcworkspace` path. | required | `$BITRISE_PROJECT_PATH` |
 </details>
 
 <details>
