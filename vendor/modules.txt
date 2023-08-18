@@ -3,7 +3,7 @@ github.com/bitrise-io/go-plist
 # github.com/bitrise-io/go-steputils/v2 v2.0.0-alpha.1
 ## explicit
 github.com/bitrise-io/go-steputils/v2/stepconf
-# github.com/bitrise-io/go-utils v1.0.1
+# github.com/bitrise-io/go-utils v1.0.9
 ## explicit
 github.com/bitrise-io/go-utils/colorstring
 github.com/bitrise-io/go-utils/command
@@ -18,13 +18,15 @@ github.com/bitrise-io/go-utils/sliceutil
 # github.com/bitrise-io/go-utils/v2 v2.0.0-alpha.1
 ## explicit
 github.com/bitrise-io/go-utils/v2/env
-# github.com/bitrise-io/go-xcode v1.0.2
+# github.com/bitrise-io/go-xcode v1.0.15
 ## explicit
 github.com/bitrise-io/go-xcode/xcodebuild
 github.com/bitrise-io/go-xcode/xcodeproject/serialized
 github.com/bitrise-io/go-xcode/xcodeproject/xcodeproj
 github.com/bitrise-io/go-xcode/xcodeproject/xcscheme
 github.com/bitrise-io/go-xcode/xcodeproject/xcworkspace
-# golang.org/x/text v0.3.7
+# golang.org/x/text v0.12.0
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm
+# howett.net/plist v1.0.0
+howett.net/plist
