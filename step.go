@@ -58,7 +58,7 @@ func (g SchemeGenerator) Run(cfg Config) error {
 	log.Infof("Collecting existing Schemes...")
 	containerToSchemes, err := container.schemes()
 	if err != nil {
-		return fmt.Errorf("getting schemes failed: %w", err)
+		log.Warnf("Failed to list schemes: %s", err)
 	}
 
 	log.Printf("Schemes:")
