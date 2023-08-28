@@ -61,20 +61,23 @@ func (g SchemeGenerator) Run(cfg Config) error {
 		log.Warnf("Failed to list schemes: %s", err)
 	}
 
-	log.Printf("Schemes:")
-	printSchemes(true, containerToSchemes, cfg.ContainerPath)
-	preexistingSharedSchemes := numberOfSharedSchemes(containerToSchemes)
-	if preexistingSharedSchemes > 0 {
-		fmt.Println()
-		log.Donef("There are %d shared Scheme(s).", preexistingSharedSchemes)
-		return nil
+	if len(containerToSchemes) > 0 {
+		log.Printf("Schemes:")
+		printSchemes(true, containerToSchemes, cfg.ContainerPath)
+
+		preexistingSharedSchemes := numberOfSharedSchemes(containerToSchemes)
+		if preexistingSharedSchemes > 0 {
+			fmt.Println()
+			log.Donef("There are %d shared Scheme(s).", preexistingSharedSchemes)
+			return nil
+		}
 	}
 
 	// Generate schemes
 	fmt.Println()
-	log.Errorf("No shared Schemes found...")
-	log.Errorf("The newly generated Schemes may differ from the ones in your Project.")
-	log.Errorf("Make sure to share your Schemes, to prevent unexpected behaviour.")
+	log.Warnf("No shared Schemes found...")
+	log.Warnf("The newly generated Schemes may differ from the ones in your Project.")
+	log.Warnf("Make sure to share your Schemes, to prevent unexpected behaviour.")
 
 	fmt.Println()
 	log.Infof("Generating Schemes...")
