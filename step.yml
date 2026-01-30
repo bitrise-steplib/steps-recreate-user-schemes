@@ -9,8 +9,13 @@ source_code_url: https://github.com/bitrise-steplib/steps-recreate-user-schemes
 support_url: https://github.com/bitrise-steplib/steps-recreate-user-schemes/issues
 host_os_tags: []
 project_type_tags:
+- cordova
+- flutter
+- ionic
 - ios
+- kotlin-multiplatform
 - macos
+- react-native
 type_tags:
 - utility
 is_requires_admin_user: false
